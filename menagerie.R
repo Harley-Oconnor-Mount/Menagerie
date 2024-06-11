@@ -37,20 +37,16 @@ flagged_phrases='\\bPREDICTED\\b|\\bHypothetical\\b|\\bc\\.f\\.\\b|
 \\benvironmental sample\\b|\\bhybrid\\b|\\bcell-line\\b|
 \\b*-like\\b|\\bUNVERIFIED\\b|\\baff\\.\\b'
 
-
 #determine barcode type from barcode
 barcode_name=readLines(barcode)[c(T,F)] #read in barcode
-
 
 if(grepl("COI", barcode_name, ignore.case = TRUE)) {
     search_term=paste0()
     barcode_type="COI"} #search for COI
 
-
 #run query
 result=rentrez::entrez_search(db = "nucleotide",
                               term = search_term,
                               retmax = 1000)
-
 print(result)
 print(flagged_phrases)

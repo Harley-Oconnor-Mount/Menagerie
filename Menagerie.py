@@ -2,12 +2,8 @@
 #Author: Harley O'Connor Mount
 #2024
 
-
-
 from Bio import Entrez
 from Bio import SeqIO
-
-
 import sys
 
 if len(sys.argv) != 3:
@@ -26,24 +22,41 @@ def get_accessions_from_query(query, max_records):
 accessions=get_accessions_from_query(query, max_records)
 accessions_list=accessions["IdList"]
 
-
 def get_sequence_by_accession(accession):
     Entrez.email = "Q5S7Z@example.com"  # Always tell NCBI who you are
     handle=Entrez.efetch(db="nucleotide", id=accession, rettype="fasta", retmode="text")
     record=SeqIO.read(handle, "fasta")
     return record
 
-
 accessions_sequences_list=[]
 for accession in accessions_list:
     sequence=get_sequence_by_accession(accession)
     accessions_sequences_list+=[sequence]
 
-sample_seq=str(get_sequence_by_accession("NC_045512.2"))
+
+def get_taxonomy_by_accession(accession):
+    Entrez.email = "Q5S7Z@example.com"  # Always tell NCBI who you are
+    handle = Entrez.efetch(db="taxonomy", id=accession, rettype="gb", retmode="text")
+    records = [record for record in SeqIO.parse(handle, "gb")]
+    if records:
+        first_record = records[0]
+        taxonomy = first_record.annotations.get("taxonomy", "")
+        return taxonomy
+    else:
+        return "Taxonomy information not found"
+
+taxonomy_list=[]
+for accession in accessions_list:
+    taxonomy=get_taxonomy_by_accession(accession)
+    taxonomy_list+=[taxonomy]
+
+info_dictionary={}
+
+for i in range(len(accessions_list)):
+    sequence=str(accessions_sequences_list[i].seq) #accessions_sequences_list.seq
+    accession=accessions_list[i]
+    description=str(accessions_sequences_list[i].description) #accessions_sequences_list[i].description
+    info_dictionary[accession]={"sequence":sequence, "description":description}
 
 
 
-
-
-print(accessions_list)
-print(accessions_sequences_list)
